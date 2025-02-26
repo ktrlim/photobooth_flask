@@ -1,0 +1,19 @@
+body {
+    text-align: center;
+    font-family: Arial, sans-serif;
+}
+
+img {
+    border: 2px solid black;
+    max-width: 100%;
+}
+
+button {
+    margin-top: 10px;
+    padding: 10px;
+    background: #ff5722;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+}

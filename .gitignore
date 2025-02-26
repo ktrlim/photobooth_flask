@@ -1,0 +1,8 @@
+# created by virtualenv automatically
+.vscode/
+bin/
+lib/
+CACHEDIR.TAG
+pyvenv.cfg
+.DS_STORE
+

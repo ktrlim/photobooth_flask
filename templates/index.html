@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Custom Photobooth</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        video, img {
+            border: 5px solid black;
+            border-radius: 10px;
+        }
+        .photo-container {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+        }
+        .photo-preview {
+            width: 100px;
+            height: 150px;
+            object-fit: cover;
+        }
+        button {
+            margin: 10px;
+            padding: 10px 15px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <h1>Photobooth</h1>
+    <h2 id="CD">Ready?</h2>
+
+    <!-- Live Camera Feed -->
+    <img src="{{ url_for('video_feed') }}" width="500">
+
+    <br>
+
+    <!-- Capture & Filters -->
+    <button onclick="capturePhoto()">Capture Photo</button>
+    <select id="filterSelect">
+        <option value="original">Original</option>
+        <option value="grayscale">Grayscale</option>
+        <option value="sepia">Sepia</option>
+    </select>
+   
+
+    <h2>Captured Photos:</h2>
+    <div class="photo-container" id="photos"></div>
+
+    <script>
+        let photos = [];
+
+        // Capture photo and add to preview
+        async function capturePhoto() {
+            
+            
+            for (let i = 0; i < 3; i++) {
+                const element = document.getElementById('CD');
+                for(let j = 3; j > 0; j--) {
+                    
+                    element.innerHTML = j;
+                    await delay(1000);
+                }
+                element.innerHTML = 'SMILE';
+                await delay(500);
+                let response = await fetch('/capture', { method: 'POST' });
+                let data = await response.json();
+                let img = document.createElement("img");
+                img.src = data.image;
+                img.className = "photo-preview";
+                document.getElementById("photos").appendChild(img);
+                photos.push(data.image);
+                element.innerHTML = "";
+            }
+            generateStrip();
+        }
+
+        // Generate and download the photo strip
+        async function generateStrip() {
+            if (photos.length === 0) {
+                alert("Capture at least one photo!");
+                return;
+            }
+
+            let filter = document.getElementById("filterSelect").value;
+            let response = await fetch('/generate_strip', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: photos, filter: filter })
+            });
+
+            if (response.ok) {
+                let blob = await response.blob();
+                let url = URL.createObjectURL(blob);
+                let a = document.createElement("a");
+                a.href = url;
+                a.download = "photo_strip.jpg";
+                a.click();
+            }
+        }
+        function delay(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+    </script>
+</body>
+</html>
