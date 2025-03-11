@@ -65,12 +65,14 @@
                 for(let j = 3; j > 0; j--) {
                     
                     element.innerHTML = j;
-                    await delay(1000);
+                    await new Promise(resolve => setTimeout(resolve, 1000));
                 }
                 element.innerHTML = 'SMILE';
-                await delay(500);
+                await new Promise(resolve => setTimeout(resolve, 500));
+
                 let response = await fetch('/capture', { method: 'POST' });
                 let data = await response.json();
+
                 let img = document.createElement("img");
                 img.src = data.image;
                 img.className = "photo-preview";
@@ -105,9 +107,7 @@
                 a.click();
             }
         }
-        function delay(ms) {
-            return new Promise(resolve => setTimeout(resolve, ms));
-        }
+        
     </script>
 </body>
 </html>
