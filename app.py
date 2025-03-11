@@ -1,4 +1,4 @@
-from flask import Flask, render_template, Response, request, send_file
+from flask import Flask, jsonify, render_template, Response, request, send_file
 import cv2
 import numpy as np
 from PIL import Image, ImageOps, ImageEnhance
@@ -8,7 +8,7 @@ import base64
 app = Flask(__name__)
 camera = cv2.VideoCapture(0)
 
-# Function to continuously stream video frames
+# function to continuously stream video frames
 def generate_frames():
     while True:
         success, frame = camera.read()
@@ -20,18 +20,19 @@ def generate_frames():
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
 
-# Capture image and send as base64
+# capture image and send as base64
 @app.route('/capture', methods=['POST'])
 def capture():
+    """captures images"""
     success, frame = camera.read()
     if not success:
         return "Failed to capture image", 500
 
-    # Convert frame to PIL format
+    # convert frame to PIL format
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(frame)
 
-    # Convert image to base64 to send to frontend
+    # convert image to base64 to send to frontend
     img_io = io.BytesIO()
     image.save(img_io, 'JPEG')
     img_io.seek(0)
@@ -39,7 +40,24 @@ def capture():
 
     return {"image": f"data:image/jpeg;base64,{img_base64}"}
 
-# Apply color filter & generate photo strip
+# receives images from frontend and stores them
+@app.route('/save_photos', methods=['POST'])
+def save_photos():
+    global stored_images
+    data = request.json
+    stored_images = data.get("images", [])  # Store in memory
+    return jsonify({"message": "Photos saved successfully"})
+
+# sends images to frontend
+@app.route('/get_photos', methods=['GET'])
+def get_photos():
+    return jsonify({"images": stored_images})
+
+@app.route('/display')
+def display():
+    return render_template("display.html")
+
+# apply color filter & generate photo strip
 @app.route('/generate_strip', methods=['POST'])
 def generate_strip():
     data = request.json

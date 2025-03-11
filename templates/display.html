@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Photo Strip</title>
+</head>
+<body>
+    <h1>Your Photo Strip</h1>
+    <div id="photo-strip"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", async function () {
+            let photoContainer = document.getElementById("photo-strip");
+
+            // Fetch stored images from backend
+            let response = await fetch('/get_photos');
+            let data = await response.json();
+            let photos = data.images;
+
+            if (photos.length === 0) {
+                photoContainer.innerHTML = "<p>No photos available.</p>";
+                return;
+            }
+
+            photos.forEach(src => {
+                let img = document.createElement("img");
+                img.src = src;
+                img.className = "photo-preview";
+                photoContainer.appendChild(img);
+            });
+        });
+    </script>
+</body>
+</html>

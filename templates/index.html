@@ -28,7 +28,9 @@
             padding: 10px 15px;
             font-size: 16px;
             cursor: pointer;
+            
         }
+        
     </style>
 </head>
 <body>
@@ -70,17 +72,30 @@
                 element.innerHTML = 'SMILE';
                 await new Promise(resolve => setTimeout(resolve, 500));
 
+                // capture photo from flask
                 let response = await fetch('/capture', { method: 'POST' });
                 let data = await response.json();
 
+                // display the photos underneath the camera feed
                 let img = document.createElement("img");
                 img.src = data.image;
                 img.className = "photo-preview";
                 document.getElementById("photos").appendChild(img);
+
+                // store image
                 photos.push(data.image);
                 element.innerHTML = "";
             }
-            generateStrip();
+            // generateStrip();
+            // send all images to flask for temp storage
+            await fetch('/save_photos', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ images: photos })
+            });
+
+            // redirect to display.html after capturing
+            window.location.href = "/display";
             captureButton.disabled = false;
         }
 
