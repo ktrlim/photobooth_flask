@@ -41,7 +41,7 @@
     <br>
 
     <!-- Capture & Filters -->
-    <button onclick="capturePhoto()">Capture Photo</button>
+    <button onclick="capturePhoto()" id="captureButton">Capture Photo</button>
     <select id="filterSelect">
         <option value="original">Original</option>
         <option value="grayscale">Grayscale</option>
@@ -57,7 +57,8 @@
 
         // Capture photo and add to preview
         async function capturePhoto() {
-            
+            captureButton = document.getElementById('captureButton');
+            captureButton.setAttribute('disabled','disabled');
             
             for (let i = 0; i < 3; i++) {
                 const element = document.getElementById('CD');
@@ -78,6 +79,7 @@
                 element.innerHTML = "";
             }
             generateStrip();
+            captureButton.disabled = false;
         }
 
         // Generate and download the photo strip
