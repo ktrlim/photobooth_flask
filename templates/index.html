@@ -4,38 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Custom Photobooth</title>
-    <style>
-        body {
-            text-align: center;
-            font-family: Arial, sans-serif;
-        }
-        video, img {
-            border: 5px solid black;
-            border-radius: 10px;
-        }
-        .photo-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-        }
-        .photo-preview {
-            width: 100px;
-            height: 150px;
-            object-fit: cover;
-        }
-        button {
-            margin: 10px;
-            padding: 10px 15px;
-            font-size: 16px;
-            cursor: pointer;
-            
-        }
-        
-    </style>
+    <link rel="stylesheet" href="../static/styles.css">
 </head>
-<body>
-    <h1>Photobooth</h1>
-    <h2 id="CD">Ready?</h2>
+<body id = 'grad'>
+    <h1 class="libre-caslon-text-regular">photobooth</h1>
+    <h2 id="CD" class="libre-caslon-text-regular">Ready?</h2>
 
     <!-- Live Camera Feed -->
     <img src="{{ url_for('video_feed') }}" width="500">
@@ -43,15 +16,24 @@
     <br>
 
     <!-- Capture & Filters -->
-    <button onclick="capturePhoto()" id="captureButton">Capture Photo</button>
-    <select id="filterSelect">
+    <button onclick="capturePhoto()" id="captureButton" class="button-27">start</button>
+    <button class="cta" onclick="capturePhoto()" id="captureButton">
+        <span>start</span>
+        <svg width="15px" height="10px" viewBox="0 0 13 10">
+          <path d="M1,5 L11,5"></path>
+          <polyline points="8 1 12 5 8 9"></polyline>
+        </svg>
+      </button>
+    <!---
+    <select id="filterSelect" class="libre-caslon-text-regular">
         <option value="original">Original</option>
         <option value="grayscale">Grayscale</option>
         <option value="sepia">Sepia</option>
     </select>
+    -->
    
 
-    <h2>Captured Photos:</h2>
+    <h2 class="libre-caslon-text-regular">Captured Photos:</h2>
     <div class="photo-container" id="photos"></div>
 
     <script>
