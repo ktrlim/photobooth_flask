@@ -4,10 +4,25 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Photo Strip</title>
+    <link rel="stylesheet" href="../static/display.css">
 </head>
-<body>
-    <h1>Your Photo Strip</h1>
-    <div id="photo-strip"></div>
+<body id="grad">
+    <h1 class="heading">your photo strip</h1>
+    <div class="strip-preview">
+        <div id="photo-strip" class="photostrip"></div>
+        <div class="strip-customization">
+            <p>Change Background:</p>
+            <div>
+                <input type="color" id="strip" name="strip" value="#ffffff" />
+                <label for="head">strip color</label>
+            </div>
+            <form action="/action_page.php">
+                <label for="text">Text:</label>
+                <input type="text" id="text" name="text"><br><br>
+            </form>
+            <button onclick="" id="downloadButton" class="button">download</button>
+        </div>
+    </div>
 
     <script>
         document.addEventListener("DOMContentLoaded", async function () {

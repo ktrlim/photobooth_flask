@@ -139,8 +139,6 @@ button {
     font-style: normal;
     margin-top: 20px;
 }
-    
-
 .button {
   cursor: pointer;
   position: relative;
@@ -188,5 +186,4 @@ button {
     border-radius: 30px;
     color: rgba(0, 0, 0, 0.15);
 }
-
 
