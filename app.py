@@ -15,6 +15,8 @@ def generate_frames():
         if not success:
             break
         else:
+            # Mirror the frame horizontally
+            frame = cv2.flip(frame, 1)  # 1 means horizontal flip
             _, buffer = cv2.imencode('.jpg', frame)
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
@@ -28,6 +30,10 @@ def capture():
     if not success:
         return "Failed to capture image", 500
 
+    # Mirror the frame to match video feed
+    frame = cv2.flip(frame, 1)
+
+    
     # convert frame to PIL format
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(frame)
