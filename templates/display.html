@@ -11,15 +11,17 @@
     <div class="strip-preview">
         <div id="photo-strip" class="photostrip"></div>
         <div class="strip-customization">
-            <p>Change Background:</p>
-            <div>
+            
+            <div class="customizations">
+                <label for="head">strip color:</label>
                 <input type="color" id="strip" name="strip" value="#ffffff" />
-                <label for="head">strip color</label>
+                
             </div>
-            <form action="/action_page.php">
-                <label for="text">Text:</label>
-                <input type="text" id="text" name="text"><br><br>
-            </form>
+            <div class="customizations">
+                <label for="fname">photostrip text:</label>
+                <input type="text" id="fname" name="firstname" placeholder="what's on your mind...">
+            </div>
+            
             <button onclick="" id="downloadButton" class="button">download</button>
         </div>
     </div>
