@@ -37,6 +37,26 @@
     <div class="photo-container" id="photos"></div>
 
     <script>
+        window.addEventListener("load", () => {
+            photos = [];
+        });
+        window.addEventListener("beforeunload", () => {
+            const element = document.getElementById('CD');
+            if (element) element.innerHTML = "";
+        });
+
+        window.addEventListener('pageshow', function (event) {
+            if (event.persisted) {
+            // Force reload if coming from cache (like via back button)
+            window.location.reload();
+            }
+        });
+
+        window.addEventListener('beforeunload', function () {
+            navigator.sendBeacon('/release_camera');
+        });
+
+
         let photos = [];
 
         // Capture photo and add to preview

@@ -6,27 +6,47 @@ import io
 import base64
 
 app = Flask(__name__)
-camera = cv2.VideoCapture(0)
+
+camera = None
+
+def get_camera():
+    global camera
+    if camera is None or not camera.isOpened():
+        camera = cv2.VideoCapture(0)
+    return camera
+
+def release_camera():
+    global camera
+    if camera is not None and camera.isOpened():
+        camera.release()
+        camera = None
+
 
 # function to continuously stream video frames
 def generate_frames():
-    while True:
-        success, frame = camera.read()
-        if not success:
-            break
-        else:
-            # Mirror the frame horizontally
-            frame = cv2.flip(frame, 1)  # 1 means horizontal flip
-            _, buffer = cv2.imencode('.jpg', frame)
-            frame = buffer.tobytes()
-            yield (b'--frame\r\n'
-                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    camera = get_camera()
+    try: 
+        while True:
+            success, frame = camera.read()
+            if not success:
+                break
+            else:
+                # Mirror the frame horizontally
+                frame = cv2.flip(frame, 1)  # 1 means horizontal flip
+                _, buffer = cv2.imencode('.jpg', frame)
+                frame = buffer.tobytes()
+                yield (b'--frame\r\n'
+                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+    finally:
+        camera.release()
 
 # capture image and send as base64
 @app.route('/capture', methods=['POST'])
 def capture():
+    camera = get_camera()
     """captures images"""
     success, frame = camera.read()
+    
     if not success:
         return "Failed to capture image", 500
 
@@ -52,6 +72,7 @@ def save_photos():
     global stored_images
     data = request.json
     stored_images = data.get("images", [])  # Store in memory
+    release_camera()
     return jsonify({"message": "Photos saved successfully"})
 
 # sends images to frontend
@@ -61,6 +82,7 @@ def get_photos():
 
 @app.route('/display')
 def display():
+    release_camera()
     return render_template("display.html")
 
 # apply color filter & generate photo strip
@@ -118,6 +140,12 @@ def video_feed():
 @app.route('/')
 def index():
     return render_template('index.html')
+
+@app.route('/release_camera', methods=['POST'])
+def release_cam():
+    release_camera()
+    return '', 204
+
 
 if __name__ == '__main__':
     app.run(debug=True)

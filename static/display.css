@@ -34,8 +34,28 @@ body {
     padding: 10px;
     width: fit-content;
     padding-top: 20px;
-    padding-bottom: 80px;
+    padding-bottom: 20px;
 }
+
+/* Add a container for the text area that maintains consistent height */
+.text-container {
+    min-height: 60px; /* Adjust this value to match your desired spacing */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+}
+
+.photostrip-text {
+    text-align: center;
+    font-weight: bold;
+    padding: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+
 
 .photostrip img {
     width: 200px;
@@ -115,6 +135,8 @@ button {
     flex-direction: flex-start  ;
 }
 
+
+
 label {
     padding: 5px;
 }
@@ -130,4 +152,3 @@ input[type=text] {
   border-bottom: 2px solid rgb(0, 0, 0);
   background-color: rgba(0, 0, 0, 0.0);
 }
-

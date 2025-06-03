@@ -13,8 +13,8 @@
         <div class="strip-customization">
             
             <div class="customizations">
-                <label for="head">strip color:</label>
-                <input type="color" id="strip" name="strip" value="#ffffff" />
+                <label for="color-picker">strip color:</label>
+                <input type="color" id="stripColor" name="stripColor" value="#ffffff" />
                 
             </div>
             <div class="customizations">
@@ -27,10 +27,29 @@
     </div>
 
     <script>
+        // determine if a color is light or dark
+        function isLightColor(hexColor) {
+            // Convert hex to RGB
+            const r = parseInt(hexColor.substr(1, 2), 16);
+            const g = parseInt(hexColor.substr(3, 2), 16);
+            const b = parseInt(hexColor.substr(5, 2), 16);
+        
+            // get relative luminance using the formula for perceived brightness
+            const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+    
+            // if luminance is greater than 0.5, it's a light color
+            return luminance > 0.5;
+        }
+
+        // redability
+        function getBestTextColor(backgroundColor) {
+            return isLightColor(backgroundColor) ? 'black' : 'white';
+        }
+
         document.addEventListener("DOMContentLoaded", async function () {
             let photoContainer = document.getElementById("photo-strip");
 
-            // Fetch stored images from backend
+            // fetch stored images from backend
             let response = await fetch('/get_photos');
             let data = await response.json();
             let photos = data.images;
@@ -45,6 +64,40 @@
                 img.src = src;
                 img.className = "photo-preview";
                 photoContainer.appendChild(img);
+            });
+
+            // Create a text container div
+            let textContainer = document.createElement("div");
+            textContainer.className = "text-container";
+
+
+            // add text element at the bottom AFTER all photos
+            let textDiv = document.createElement("div");
+            textDiv.id = "photostrip-text";
+            textDiv.className = "photostrip-text";
+            textDiv.style.display = "none"; // Initially hidden
+            photoContainer.appendChild(textDiv);
+
+            // add event listeners for color picker and text input
+            let colorPicker = document.getElementById("stripColor");
+            let textInput = document.getElementById("fname");
+            let textColorRadios = document.querySelectorAll('input[name="textColor"]');
+
+            colorPicker.addEventListener("input", function() {
+                const selectedColor = this.value;
+                photoContainer.style.backgroundColor = this.value;
+                // auto-adjust text color based on background
+                const bestTextColor = getBestTextColor(selectedColor);
+                textDiv.style.color = bestTextColor;
+            });
+
+            textInput.addEventListener("input", function() {
+                if (this.value.trim() !== "") {
+                    textDiv.textContent = this.value;
+                    textDiv.style.display = "block";
+                } else {
+                    textDiv.style.display = "none";
+                }
             });
         });
     </script>
