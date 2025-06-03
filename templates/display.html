@@ -9,43 +9,71 @@
 <body id="grad">
     <h1 class="heading">your photo strip</h1>
     <div class="strip-preview">
-        <div id="photo-strip" class="photostrip"></div>
+        <div class="stripFrame">
+            <div id="photo-strip" class="photostrip"></div>
+        </div>
         <div class="strip-customization">
-            
             <div class="customizations">
                 <label for="color-picker">strip color:</label>
                 <input type="color" id="stripColor" name="stripColor" value="#ffffff" />
-                
             </div>
             <div class="customizations">
                 <label for="fname">photostrip text:</label>
                 <input type="text" id="fname" name="firstname" placeholder="what's on your mind...">
             </div>
-            
-            <button onclick="" id="downloadButton" class="button">download</button>
+            <button onclick="downloadPhotostrip()" id="downloadButton" class="button">download</button>
         </div>
     </div>
-
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script>
-        // determine if a color is light or dark
+        // Determine if a color is light or dark
         function isLightColor(hexColor) {
             // Convert hex to RGB
             const r = parseInt(hexColor.substr(1, 2), 16);
             const g = parseInt(hexColor.substr(3, 2), 16);
             const b = parseInt(hexColor.substr(5, 2), 16);
         
-            // get relative luminance using the formula for perceived brightness
+            // Get relative luminance using the formula for perceived brightness
             const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
     
-            // if luminance is greater than 0.5, it's a light color
+            // If luminance is greater than 0.5, it's a light color
             return luminance > 0.5;
         }
 
-        // redability
+        // Fuction for redability
         function getBestTextColor(backgroundColor) {
             return isLightColor(backgroundColor) ? 'black' : 'white';
         }
 
+        // Using html2canvas download the photostrip
+        function downloadPhotostrip() {
+            const photostrip = document.getElementById('photo-strip');
+            const downloadButton = document.getElementById('downloadButton');
+            
+            downloadButton.disabled = true;
+            downloadButton.textContent = 'downloading...';
+            
+            html2canvas(photostrip, {
+                backgroundColor: null,
+                scale: 2,
+                useCORS: true,
+                allowTaint: true
+            }).then(canvas => {
+                const link = document.createElement('a');
+                link.download = 'photostrip.png';
+                link.href = canvas.toDataURL('image/png');
+                
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                
+                downloadButton.disabled = false;
+                downloadButton.textContent = 'download';
+            });
+        }
+
+        // Event listeners
         document.addEventListener("DOMContentLoaded", async function () {
             let photoContainer = document.getElementById("photo-strip");
 
@@ -76,7 +104,7 @@
             textDiv.className = "photostrip-text";
             textDiv.style.display = "none"; // Initially hidden
 
-            // CORRECT - Add textDiv to textContainer, then textContainer to photoContainer
+            // Add textDiv to textContainer, then textContainer to photoContainer
             textContainer.appendChild(textDiv);
             photoContainer.appendChild(textContainer);
 

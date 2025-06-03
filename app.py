@@ -22,7 +22,7 @@ def release_camera():
         camera = None
 
 
-# function to continuously stream video frames
+# Function to continuously stream video frames
 def generate_frames():
     camera = get_camera()
     try: 
@@ -40,7 +40,7 @@ def generate_frames():
     finally:
         camera.release()
 
-# capture image and send as base64
+# Capture image and send as base64
 @app.route('/capture', methods=['POST'])
 def capture():
     camera = get_camera()
@@ -54,11 +54,11 @@ def capture():
     frame = cv2.flip(frame, 1)
 
     
-    # convert frame to PIL format
+    # Convert frame to PIL format
     frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
     image = Image.fromarray(frame)
 
-    # convert image to base64 to send to frontend
+    # Convert image to base64 to send to frontend
     img_io = io.BytesIO()
     image.save(img_io, 'JPEG')
     img_io.seek(0)
@@ -66,7 +66,7 @@ def capture():
 
     return {"image": f"data:image/jpeg;base64,{img_base64}"}
 
-# receives images from frontend and stores them
+# Receives images from frontend and stores them
 @app.route('/save_photos', methods=['POST'])
 def save_photos():
     global stored_images
@@ -75,7 +75,7 @@ def save_photos():
     release_camera()
     return jsonify({"message": "Photos saved successfully"})
 
-# sends images to frontend
+# Sends images to frontend
 @app.route('/get_photos', methods=['GET'])
 def get_photos():
     return jsonify({"images": stored_images})
@@ -85,12 +85,11 @@ def display():
     release_camera()
     return render_template("display.html")
 
-# apply color filter & generate photo strip
+# Apply color filter & generate photo strip
 @app.route('/generate_strip', methods=['POST'])
 def generate_strip():
     data = request.json
     images_data = data.get("images", [])
-    filter_type = data.get("filter", "original")
 
     if not images_data:
         return "No images received", 400
@@ -106,19 +105,6 @@ def generate_strip():
     # Process each image
     for idx, img_data in enumerate(images_data):
         img = Image.open(io.BytesIO(base64.b64decode(img_data.split(",")[1])))
-        
-        # Apply color filter
-        if filter_type == "grayscale":
-            img = ImageOps.grayscale(img).convert("RGB")
-        elif filter_type == "sepia":
-            sepia = np.array(img.convert("RGB"))
-            tr = (sepia[:, :, 0] * 0.393 + sepia[:, :, 1] * 0.769 + sepia[:, :, 2] * 0.189)
-            tg = (sepia[:, :, 0] * 0.349 + sepia[:, :, 1] * 0.686 + sepia[:, :, 2] * 0.168)
-            tb = (sepia[:, :, 0] * 0.272 + sepia[:, :, 1] * 0.534 + sepia[:, :, 2] * 0.131)
-            sepia[:, :, 0] = np.clip(tr, 0, 255)
-            sepia[:, :, 1] = np.clip(tg, 0, 255)
-            sepia[:, :, 2] = np.clip(tb, 0, 255)
-            img = Image.fromarray(sepia)
 
         # Resize & paste into strip
         img = ImageOps.fit(img, (target_width, target_height))

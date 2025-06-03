@@ -9,30 +9,9 @@
 <body id = 'grad'>
     <h1 class="heading">photobooth &#x2661;</h1>
     <h2 id="CD" class="libre-caslon-text-regular">Ready?</h2>
-
-    <!-- Live Camera Feed -->
     <img src="{{ url_for('video_feed') }}" width="500">
-
     <br>
-
-    <!-- Capture & Filters -->
     <button onclick="capturePhoto()" id="captureButton" class="button">start</button>
-    <!--- <button class="cta" onclick="capturePhoto()" id="captureButton">
-        <span>start</span>
-        <svg width="15px" height="10px" viewBox="0 0 13 10">
-          <path d="M1,5 L11,5"></path>
-          <polyline points="8 1 12 5 8 9"></polyline>
-        </svg>
-      </button>
-      
-    <select id="filterSelect" class="libre-caslon-text-regular">
-        <option value="original">Original</option>
-        <option value="grayscale">Grayscale</option>
-        <option value="sepia">Sepia</option>
-    </select>
-    -->
-   
-
     <h2 class="libre-caslon-text-regular">Captured Photos:</h2>
     <div class="photo-container" id="photos"></div>
 
@@ -74,29 +53,28 @@
                 element.innerHTML = 'SMILE';
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // capture photo from flask
+                // Capture photo from flask
                 let response = await fetch('/capture', { method: 'POST' });
                 let data = await response.json();
 
-                // display the photos underneath the camera feed
+                // Display the photos underneath the camera feed
                 let img = document.createElement("img");
                 img.src = data.image;
                 img.className = "photo-preview";
                 document.getElementById("photos").appendChild(img);
 
-                // store image
+                // Store image
                 photos.push(data.image);
                 element.innerHTML = "";
             }
-            // generateStrip();
-            // send all images to flask for temp storage
+            // Send all images to flask for temp storage
             await fetch('/save_photos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ images: photos })
             });
 
-            // redirect to display.html after capturing
+            // Redirect to display.html after capturing
             window.location.href = "/display";
             captureButton.disabled = false;
         }

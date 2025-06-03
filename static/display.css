@@ -7,8 +7,8 @@ body {
     font-style: normal;
     display: flex;
     
-    align-items: center;     /* vertically center */
-    height: 100vh;           /* full viewport height */
+    align-items: center;
+    height: 100vh;
     margin: 10;
     flex-direction: column;
 }
@@ -27,17 +27,16 @@ body {
 
 .photostrip {
     display: flex;
-    flex-direction: column; /* Stack images vertically */
+    flex-direction: column;
     gap: 10px;
     background-color: #fffcf9;
-    align-items: center; /* Optional: center the images horizontally */
+    align-items: center;
     padding: 10px;
     width: fit-content;
     padding-top: 20px;
     padding-bottom: 20px;
 }
 
-/* Add a container for the text area that maintains consistent height */
 .text-container {
     min-height: 45px;
     display: flex;
@@ -60,6 +59,11 @@ body {
 .photostrip img {
     width: 200px;
     height: auto;
+}
+
+.stripFrame {
+  box-shadow: #333;
+  box-shadow: 0 0px 20px rgb(0, 0, 0, 0.5);
 }
 
 .strip-customization {
