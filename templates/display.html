@@ -70,13 +70,15 @@
             let textContainer = document.createElement("div");
             textContainer.className = "text-container";
 
-
-            // add text element at the bottom AFTER all photos
+            // Create text element inside the container
             let textDiv = document.createElement("div");
             textDiv.id = "photostrip-text";
             textDiv.className = "photostrip-text";
             textDiv.style.display = "none"; // Initially hidden
-            photoContainer.appendChild(textDiv);
+
+            // CORRECT - Add textDiv to textContainer, then textContainer to photoContainer
+            textContainer.appendChild(textDiv);
+            photoContainer.appendChild(textContainer);
 
             // add event listeners for color picker and text input
             let colorPicker = document.getElementById("stripColor");
