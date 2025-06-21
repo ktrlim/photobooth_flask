@@ -125,8 +125,8 @@ video, img {
     gap: 10px;
 }
 .photo-preview {
-    width: 100px;
-    height: 150px;
+    width: 120px;
+    height: 60px;
     object-fit: cover;
 }
 button {
