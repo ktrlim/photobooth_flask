@@ -1,108 +1,76 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>Custom Photobooth</title>
     <link rel="stylesheet" href="../static/index.css">
 </head>
-<body id = 'grad'>
+<body id='grad'>
     <h1 class="heading">photobooth &#x2661;</h1>
     <h2 id="CD" class="libre-caslon-text-regular">Ready?</h2>
-    <img src="{{ url_for('video_feed') }}" width="500">
+    <video id="video" width="500" autoplay></video>
+    <canvas id="canvas" width="500" height="375" style="display:none;"></canvas>
     <br>
     <button onclick="capturePhoto()" id="captureButton" class="button">start</button>
     <h2 class="libre-caslon-text-regular">Captured Photos:</h2>
     <div class="photo-container" id="photos"></div>
 
     <script>
-        window.addEventListener("load", () => {
-            photos = [];
-        });
-        window.addEventListener("beforeunload", () => {
-            const element = document.getElementById('CD');
-            if (element) element.innerHTML = "";
-        });
-
-        window.addEventListener('pageshow', function (event) {
-            if (event.persisted) {
-            // Force reload if coming from cache (like via back button)
-            window.location.reload();
-            }
-        });
-
-        window.addEventListener('beforeunload', function () {
-            navigator.sendBeacon('/release_camera');
-        });
-
-
         let photos = [];
+        const video = document.getElementById('video');
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
 
-        // Capture photo and add to preview
+        navigator.mediaDevices.getUserMedia({ video: true })
+            .then(stream => { video.srcObject = stream; })
+            .catch(err => console.error("Camera error: ", err));
+
         async function capturePhoto() {
-            captureButton = document.getElementById('captureButton');
+            const captureButton = document.getElementById('captureButton');
             captureButton.setAttribute('disabled','disabled');
-            
+
             for (let i = 0; i < 3; i++) {
                 const element = document.getElementById('CD');
-                for(let j = 3; j > 0; j--) {
-                    
+                for (let j = 3; j > 0; j--) {
                     element.innerHTML = j;
                     await new Promise(resolve => setTimeout(resolve, 1000));
                 }
                 element.innerHTML = 'SMILE';
                 await new Promise(resolve => setTimeout(resolve, 500));
 
-                // Capture photo from flask
-                let response = await fetch('/capture', { method: 'POST' });
+                // Capture image from webcam video
+                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                let imageData = canvas.toDataURL('image/jpeg');
+
+                // Send to Flask
+                let response = await fetch('/capture', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ image: imageData })
+                });
                 let data = await response.json();
 
-                // Display the photos underneath the camera feed
+                // Show preview
                 let img = document.createElement("img");
                 img.src = data.image;
                 img.className = "photo-preview";
                 document.getElementById("photos").appendChild(img);
 
-                // Store image
                 photos.push(data.image);
                 element.innerHTML = "";
             }
-            // Send all images to flask for temp storage
+
+            // Save photos on server for /display page
             await fetch('/save_photos', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ images: photos })
             });
 
-            // Redirect to display.html after capturing
             window.location.href = "/display";
             captureButton.disabled = false;
         }
-
-        // Generate and download the photo strip
-        async function generateStrip() {
-            if (photos.length === 0) {
-                alert("Capture at least one photo!");
-                return;
-            }
-
-            let filter = document.getElementById("filterSelect").value;
-            let response = await fetch('/generate_strip', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ images: photos, filter: filter })
-            });
-
-            if (response.ok) {
-                let blob = await response.blob();
-                let url = URL.createObjectURL(blob);
-                let a = document.createElement("a");
-                a.href = url;
-                a.download = "photo_strip.jpg";
-                a.click();
-            }
-        }
-        
     </script>
 </body>
 </html>
