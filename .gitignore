@@ -5,4 +5,5 @@ lib/
 CACHEDIR.TAG
 pyvenv.cfg
 .DS_STORE
+__pycache__/
 
